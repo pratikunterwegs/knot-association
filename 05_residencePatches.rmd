@@ -37,10 +37,6 @@ ci <- function(x){qnorm(0.975)*sd(x, na.rm = T)/sqrt((length(x)))}
 ## Patch construction
 
 ```{r remove_old_data, eval=FALSE}
-if(file.exists("data/data2018/data_2018_tidal_mean_speed.csv")){
-  file.remove("data/data2018/data_2018_tidal_mean_speed.csv")
-}
-
 if(file.exists("data/data2018/data_2018_patch_summary.csv")){
   file.remove("data/data2018/data_2018_patch_summary.csv")
 }
@@ -64,34 +60,15 @@ data <- split(x = data, f = data$tag) %>%
   map(function(l) l$data_file)
 
 # map inferResidence, classifyPath, and getPatches over data
-for(i in 1:length(data)){
-  patch_data <- map(data[[i]], function(l){
-  
+walk(data[119:134], function(df_list){
+  patch_data <- map(df_list, function(l){
+    
     # read the data file
     temp_data <- fread(l)
     temp_data[,ts:=fastPOSIXct(ts)]
     
     id <- unique(temp_data$id)
     tide_number <- unique(temp_data$tide_number)
-    
-    # get data summary for the tidal cycle
-    {
-      data_summary <- temp_data[,.(duration = (max(time) - min(time))/60,
-                                   n_fixes = length(x),
-                                   prop_fixes = length(x) / ((max(time) - min(time))/30)),
-                                by = .(id, tide_number)]
-      
-      sld <- watlastools::wat_simple_dist(temp_data, "x", "y")
-      timelag <- c(NA, as.numeric(diff(temp_data$time)))
-      speed <- sld/timelag
-      
-      data_summary[,`:=`(mean_speed = mean(speed, na.rm=TRUE),
-                         ci95_speed = ci(speed))]
-      
-      # write total distance for the tidal cycle
-      fwrite(data_summary, file = "data/data2018/data_2018_tidal_mean_speed.csv", 
-             append = TRUE, scipen = 6)
-    }
     
     # wrap process in try catch
     tryCatch(
@@ -107,11 +84,11 @@ for(i in 1:length(data)){
         
         # watlastools function to get patches
         patch_dt <- wat_make_res_patch(somedata = temp_data,
-                                         bufferSize = 10,
-                                         spatIndepLim = 100,
-                                         tempIndepLim = 30,
-                                         restIndepLim = 30,
-                                         minFixes = 3)
+                                       bufferSize = 10,
+                                       spatIndepLim = 100,
+                                       tempIndepLim = 30,
+                                       restIndepLim = 30,
+                                       minFixes = 3)
         # print message
         message(as.character(glue('patches {id}_{tide_number} done')))
         return(patch_dt)
@@ -124,17 +101,30 @@ for(i in 1:length(data)){
     )
   })
   
-  # repair high tide patches across an individual's tidal cycles
-  repaired_data <- wat_repair_ht_patches(patch_data_list = patch_data)
-  # write patch summary data
-  
-  if(all(is.data.frame(repaired_data), nrow(repaired_data) > 0)){
-    # watlastools function to get patch data as spatial
-    patch_summary <- wat_get_patch_summary(resPatchData = repaired_data,
-                                           whichData = "summary")
-    fwrite(patch_summary, file = "data/data2018/data_2018_patch_summary.csv",
-           append = TRUE)
-  }
-}
+  tryCatch(
+    { # repair high tide patches across an individual's tidal cycles
+      repaired_data <- wat_repair_ht_patches(patch_data_list = patch_data)
+      # write patch summary data
+      
+      if(all(is.data.frame(repaired_data), nrow(repaired_data) > 0)){
+        # watlastools function to get patch data as summary
+        patch_summary <- wat_get_patch_summary(res_patch_data = repaired_data,
+                                               whichData = "summary")
+        fwrite(patch_summary, file = "data/data2018/data_2018_patch_summary.csv",
+               append = TRUE)
+        
+        # we also want the spatial object
+        patch_spatial <- wat_get_patch_summary(res_patch_data = repaired_data,
+                                               whichData = "spatial")
+        sf::`st_crs<-`(patch_spatial, 32631)
+      }
+      sf::st_write(patch_spatial, dsn = "data/data2018/spatials/patches_2018.gpkg",
+                   append = TRUE)
+    },
+    error = function(e){
+      message(glue::glue('patch writing errored'))
+    }
+  )
+})
 
 ```
