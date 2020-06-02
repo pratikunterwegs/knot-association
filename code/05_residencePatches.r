@@ -1,20 +1,20 @@
----
-editor_options: 
-  chunk_output_type: console
----
-
-# Residence patch construction
-
-This section is about using the main `watlastools` functions to infer residence points when data is missing from a movement track, to classify points into residence or travelling, and to construct low-tide residence patches from the residence points. Summary statistics on these spatial outputs are then exported to file for further use.
-
-**Workflow**
-
-1. Prepare `watlastools` and required libraries,
-2. Read data, infer residence, classify points, construct patches, repair patches, and write movement data and patch summary to file.
-
-## Prepare libraries
-
-```{r prep_libs, message=FALSE, warning=FALSE}
+#' ---
+#' editor_options: 
+#'   chunk_output_type: console
+#' ---
+#' 
+#' # Residence patch construction
+#' 
+#' This section is about using the main `watlastools` functions to infer residence points when data is missing from a movement track, to classify points into residence or travelling, and to construct low-tide residence patches from the residence points. Summary statistics on these spatial outputs are then exported to file for further use.
+#' 
+#' **Workflow**
+#' 
+#' 1. Prepare `watlastools` and required libraries,
+#' 2. Read data, infer residence, classify points, construct patches, repair patches, and write movement data and patch summary to file.
+#' 
+#' ## Prepare libraries
+#' 
+## ----prep_libs, message=FALSE, warning=FALSE-----------
 # load watlastools or install if not available
 if("watlastools" %in% installed.packages() == FALSE){
   devtools::install_github("pratikunterwegs/watlastools")
@@ -32,19 +32,19 @@ library(fasttime)
 
 # functions for this stage alone
 ci <- function(x){qnorm(0.975)*sd(x, na.rm = T)/sqrt((length(x)))}
-```
 
-## Patch construction
-
-```{r remove_old_data}
+#' 
+#' ## Patch construction
+#' 
+## ----remove_old_data-----------------------------------
 if(file.exists("data/data2018/data_2018_patch_summary.csv")){
   file.remove("data/data2018/data_2018_patch_summary.csv")
 }
-```
 
-Process patches. Takes approx. 5 hours for 3 second data.
-
-```{r make_patches, message=FALSE, warning=FALSE}
+#' 
+#' Process patches. Takes approx. 5 hours for 3 second data.
+#' 
+## ----make_patches, message=FALSE, warning=FALSE--------
 # make a vector of data files to read
 data_files <- list.files(path = "data/data2018/revisitData", 
                          pattern = "_revisit.csv", full.names = TRUE)
@@ -127,4 +127,4 @@ walk(data[119:134], function(df_list){
   )
 })
 
-```
+

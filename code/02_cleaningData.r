@@ -1,20 +1,20 @@
----
-editor_options: 
-  chunk_output_type: console
----
-
-# Cleaning data
-
-This section is about cleaning downloaded data using the `cleanData` function in the [WATLAS Utilities package](https://github.com/pratikunterwegs/watlastools).
-
-**Workflow**
-
-1. Prepare required libraries.
-2. Read in data, apply the cleaning function, and overwrite local data.
-
-## Prepare `watlastools` and other libraries
-
-```{r install_watlastools_2, message=FALSE, warning=FALSE}
+#' ---
+#' editor_options: 
+#'   chunk_output_type: console
+#' ---
+#' 
+#' # Cleaning data
+#' 
+#' This section is about cleaning downloaded data using the `cleanData` function in the [WATLAS Utilities package](https://github.com/pratikunterwegs/watlastools).
+#' 
+#' **Workflow**
+#' 
+#' 1. Prepare required libraries.
+#' 2. Read in data, apply the cleaning function, and overwrite local data.
+#' 
+#' ## Prepare `watlastools` and other libraries
+#' 
+## ----install_watlastools_2, message=FALSE, warning=FALSE----
 # watlastools assumed installed from the previous step
 # if not, install from the github repo as shown below
 
@@ -28,18 +28,18 @@ library(glue)
 library(fasttime)
 library(bit64)
 library(stringr)
-```
 
-## Prepare to remove attractor points
-
-```{r read_attractors, message=FALSE, warning=FALSE}
+#' 
+#' ## Prepare to remove attractor points
+#' 
+## ----read_attractors, message=FALSE, warning=FALSE-----
 # read in identified attractor points
 atp <- fread("data/data2018/attractor_points.txt")
-```
 
-## Read, clean, and write data
-
-```{r read_in_raw_data, message=FALSE, warning=FALSE}
+#' 
+#' ## Read, clean, and write data
+#' 
+## ----read_in_raw_data, message=FALSE, warning=FALSE----
 # make a list of data files to read
 data_files <- list.files(path = "data/data2018/locs_raw", pattern = "whole_season*", full.names = TRUE)
 
@@ -98,5 +98,5 @@ map(data_files, function(df){
     })
 })
 
-```
 
+#' 

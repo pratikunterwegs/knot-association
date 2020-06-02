@@ -1,25 +1,25 @@
----
-editor_options: 
-  chunk_output_type: console
----
-
-# Revisit analysis
-
-This section is about splitting the data by tidal cycle, and passing the individual- and tidal cycle-specific data to revisit analysis, which is implemented using the package `recurse`.
-
-**Workflow**
-
-1. Prepare required libraries,
-2. Performing recurse:
-  - Read in movement data and split by tidal cycle,
-  - Perform revisit analysis using `recurse`,
-  - Write data with revisit metrics to file.
-
-## Prepare libraries
-
-This section uses the recurse package [@bracis2018].
-
-```{r install_recurse, message=FALSE, warning=FALSE}
+#' ---
+#' editor_options: 
+#'   chunk_output_type: console
+#' ---
+#' 
+#' # Revisit analysis
+#' 
+#' This section is about splitting the data by tidal cycle, and passing the individual- and tidal cycle-specific data to revisit analysis, which is implemented using the package `recurse`.
+#' 
+#' **Workflow**
+#' 
+#' 1. Prepare required libraries,
+#' 2. Performing recurse:
+#'   - Read in movement data and split by tidal cycle,
+#'   - Perform revisit analysis using `recurse`,
+#'   - Write data with revisit metrics to file.
+#' 
+#' ## Prepare libraries
+#' 
+#' This section uses the recurse package [@bracis2018].
+#' 
+## ----install_recurse, message=FALSE, warning=FALSE-----
 # load recurse or install if not available
 if("recurse" %in% installed.packages() == FALSE){
   install.packages("recurse")
@@ -33,11 +33,11 @@ library(glue)
 library(dplyr)
 library(fasttime)
 library(stringr)
-```
 
-## Read data, split, recurse, write
-
-```{r recurse_analysis, message=FALSE, warning=FALSE}
+#' 
+#' ## Read data, split, recurse, write
+#' 
+## ----recurse_analysis, message=FALSE, warning=FALSE----
 # read in data
 data_files <- list.files(path = "data/data2018/", pattern = "id_", full.names = TRUE)
 
@@ -124,5 +124,5 @@ map(data_files, function(df){
   })
   
 })
-```
 
+#' 

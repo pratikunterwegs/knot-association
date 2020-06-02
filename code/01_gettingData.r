@@ -1,21 +1,21 @@
----
-editor_options: 
-  chunk_output_type: console
----
-
-# Getting data
-
-This section focusses on accessing and downloading WATLAS data. This is done using functions in the [WATLAS Utilities package](https://github.com/pratikunterwegs/watlastools). 
-
-**Workflow**
-
-1. Preparing required libraries.
-2. Reading tag data with deployment start dates from a local file. This file is not yet publicly available.
-3. Connecting to the NIOZ databse and downloading data. This database is also not public-access.
-
-## Prepare `watlastools` and other libraries
-
-```{r install_watlastools, message=FALSE, warning=FALSE}
+#' ---
+#' editor_options: 
+#'   chunk_output_type: console
+#' ---
+#' 
+#' # Getting data
+#' 
+#' This section focusses on accessing and downloading WATLAS data. This is done using functions in the [WATLAS Utilities package](https://github.com/pratikunterwegs/watlastools). 
+#' 
+#' **Workflow**
+#' 
+#' 1. Preparing required libraries.
+#' 2. Reading tag data with deployment start dates from a local file. This file is not yet publicly available.
+#' 3. Connecting to the NIOZ databse and downloading data. This database is also not public-access.
+#' 
+#' ## Prepare `watlastools` and other libraries
+#' 
+## ----install_watlastools, message=FALSE, warning=FALSE----
 # install the package watlastools from master branch using the following
 # install.packages("devtools")
 library(devtools)
@@ -29,11 +29,11 @@ library(ggplot2)
 library(ggthemes)
 library(purrr)
 library(glue)
-```
 
-## Read in tag deployment data
-
-```{r get_deployment_data, message=FALSE, warning=FALSE}
+#' 
+#' ## Read in tag deployment data
+#' 
+## ----get_deployment_data, message=FALSE, warning=FALSE----
 # read deployment data from local file in data folder
 tag_info <- fread("data/data2018/SelinDB.csv")
 
@@ -45,26 +45,26 @@ tag_info[,Release_Date := as.POSIXct(paste(Release_Date, Release_Time, sep = " "
 
 # check new release date column
 head(tag_info$Release_Date)
-```
 
-```{r plot_release_schedule, echo=FALSE, fig.cap="Knots released per week of 2018.", message=FALSE, warning=FALSE}
+#' 
+## ----plot_release_schedule, echo=FALSE, fig.cap="Knots released per week of 2018.", message=FALSE, warning=FALSE----
 # check release cohort
 ggplot(tag_info)+
   geom_bar(aes(x = week(Release_Date)), col = 1, fill = "grey")+
   ggthemes::theme_few()+
   labs(x = "release week (2018)", y = "# knots released",
        caption = Sys.time())
-```
 
-
-## Get data and save locally
-
-```{r get_acess, warning=FALSE, message=FALSE}
+#' 
+#' 
+#' ## Get data and save locally
+#' 
+## ----get_acess, warning=FALSE, message=FALSE-----------
 # read in database access parameters from a local file
 data_access <- fread("data/access_params.txt")
-```
 
-```{r get_data, message=FALSE, warning=FALSE}
+#' 
+## ----get_data, message=FALSE, warning=FALSE------------
 # create a data storage file if not present
 # use the getData function from watlastools on the tag_info data frame
 # this is placed inside a pmap wrapper to automate access for all birds
@@ -88,5 +88,5 @@ pmap(tag_info[,.(Toa_Tag, Release_Date)], function(Toa_Tag, Release_Date){
          dateTimeAs = "ISO")
   
 })
-```
 
+#' 

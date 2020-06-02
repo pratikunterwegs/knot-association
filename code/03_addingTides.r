@@ -1,22 +1,22 @@
----
-editor_options: 
-  chunk_output_type: console
----
-
-# Adding tidal cycle data
-
-This section is about adding tidal cycle data to individual trajectories. This is done to split the data up into convenient, and biologically sensible units. This section uses the package `VulnToolkit` [@VulnToolkit2014] to identify high tide times from water-level data provided by Rijkswaterstaat for the measuring point at West Terschelling.
-
-**Workflow**
-
-1. Prepare required libraries,
-2. Read in water level data and identify high tides,
-3. Write tidal cycle data to local file,
-4. Add time since high tide to movement data.
-
-## Prepare libraries
-
-```{r install_vulntoolkit_2, message=FALSE, warning=FALSE}
+#' ---
+#' editor_options: 
+#'   chunk_output_type: console
+#' ---
+#' 
+#' # Adding tidal cycle data
+#' 
+#' This section is about adding tidal cycle data to individual trajectories. This is done to split the data up into convenient, and biologically sensible units. This section uses the package `VulnToolkit` [@VulnToolkit2014] to identify high tide times from water-level data provided by Rijkswaterstaat for the measuring point at West Terschelling.
+#' 
+#' **Workflow**
+#' 
+#' 1. Prepare required libraries,
+#' 2. Read in water level data and identify high tides,
+#' 3. Write tidal cycle data to local file,
+#' 4. Add time since high tide to movement data.
+#' 
+#' ## Prepare libraries
+#' 
+## ----install_vulntoolkit_2, message=FALSE, warning=FALSE----
 # load VulnToolkit or install if not available
 if("VulnToolkit" %in% installed.packages() == FALSE){
   devtools::install_github("troyhill/VulnToolkit")
@@ -33,13 +33,13 @@ library(fasttime)
 library(lubridate)
 
 library(watlastools)
-```
 
-## Read water level data
-
-Water level data for [West Terschelling](https://waterinfo.rws.nl/#!/details/publiek/waterhoogte-t-o-v-nap/West-Terschelling(WTER)/Waterhoogte___20Oppervlaktewater___20t.o.v.___20Normaal___20Amsterdams___20Peil___20in___20cm), a settlement approx. 10km from the field site are provided by Rijkswaterstaat's [Waterinfo](https://waterinfo.rws.nl/#!/nav/bulkdownload/parameters/Waterhoogten/), in cm above Amsterdam Ordnance Datum. These data are manually downloaded in the range July 1, 2018 -- October 31, 2018 and saved in `data/data2018`.
-
-```{r read_waterlevel_data, message=FALSE, warning=FALSE}
+#' 
+#' ## Read water level data
+#' 
+#' Water level data for [West Terschelling](https://waterinfo.rws.nl/#!/details/publiek/waterhoogte-t-o-v-nap/West-Terschelling(WTER)/Waterhoogte___20Oppervlaktewater___20t.o.v.___20Normaal___20Amsterdams___20Peil___20in___20cm), a settlement approx. 10km from the field site are provided by Rijkswaterstaat's [Waterinfo](https://waterinfo.rws.nl/#!/nav/bulkdownload/parameters/Waterhoogten/), in cm above Amsterdam Ordnance Datum. These data are manually downloaded in the range July 1, 2018 -- October 31, 2018 and saved in `data/data2018`.
+#' 
+## ----read_waterlevel_data, message=FALSE, warning=FALSE----
 # read in waterlevel data
 waterlevel <- fread("data/data2018/waterlevelWestTerschelling.csv", sep = ";")
 
@@ -53,13 +53,13 @@ waterlevel[,dateTime := as.POSIXct(paste(date, time, sep = " "),
                                    format = "%d-%m-%Y %H:%M:%S", tz = "CET")]
 
 waterlevel <- setDT(distinct(setDF(waterlevel), dateTime, .keep_all = TRUE))
-```
 
-## Calculate high tides
-
-A tidal period of 12 hours 25 minutes is taken from [Rijkswaterstaat](https://www.rijkswaterstaat.nl/water/waterdata-en-waterberichtgeving/waterdata/getij/index.aspx).
-
-```{r get_high_tide, message=FALSE, warning=FALSE}
+#' 
+#' ## Calculate high tides
+#' 
+#' A tidal period of 12 hours 25 minutes is taken from [Rijkswaterstaat](https://www.rijkswaterstaat.nl/water/waterdata-en-waterberichtgeving/waterdata/getij/index.aspx).
+#' 
+## ----get_high_tide, message=FALSE, warning=FALSE-------
 # use the HL function from vulnToolkit to get high tides
 tides <- VulnToolkit::HL(waterlevel$level,
                          waterlevel$dateTime, period = 12.41, 
@@ -75,17 +75,17 @@ first_release <- min(tag_info$Release_Date) - (3600*24)
 # remove tides before first release
 tides <- setDT(tides)[time > first_release, ][,tide2:=NULL]
 tides[,tide_number:=1:nrow(tides)]
-```
 
-```{r write_tide_data, message=FALSE, warning=FALSE}
+#' 
+## ----write_tide_data, message=FALSE, warning=FALSE-----
 # write to local file
 fwrite(tides, file = "data/data2018/tidesSummer2018.csv", 
        dateTimeAs = "ISO")
-```
 
-## Add time since high tide
-
-```{r time_to_high_tide, message=FALSE, warning=FALSE}
+#' 
+#' ## Add time since high tide
+#' 
+## ----time_to_high_tide, message=FALSE, warning=FALSE----
 # read in data and add time since high tide
 data_files <- list.files(path = "data/data2018/locs_proc", pattern = "id_", full.names = TRUE)
 data_ids <- str_extract(data_files, "(id_\\d+)") %>% str_sub(-3,-1)
@@ -114,5 +114,5 @@ map(data_files, function(df){
   message(glue('tag {unique(temp_data$id)} added time since high tide'))
   rm(temp_data)
 })
-```
 
+#' 

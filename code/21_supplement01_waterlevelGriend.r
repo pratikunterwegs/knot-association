@@ -1,13 +1,13 @@
----
-editor_options: 
-  chunk_output_type: console
----
-
-# Bathymetry of the Griend mudflats
-
-## Get data and plot basic trend
-
-```{r load_libs_s01}
+#' ---
+#' editor_options: 
+#'   chunk_output_type: console
+#' ---
+#' 
+#' # Bathymetry of the Griend mudflats
+#' 
+#' ## Get data and plot basic trend
+#' 
+## ----load_libs_s01-------------------------------------
 # load libs to read bathymetry
 library(raster)
 library(rayshader)
@@ -21,9 +21,9 @@ library(stringr)
 # plot libs
 library(ggplot2)
 library(ggthemes)
-```
 
-```{r load_data_s01}
+#' 
+## ----load_data_s01-------------------------------------
 # load bathymetry and subset
 data <- raster("data/bathymetry_waddenSea_2015.tif")
 griend <- st_read("griend_polygon/griend_polygon.shp") %>% 
@@ -39,9 +39,9 @@ data_m <- raster_to_matrix(data)
 
 # get quantiles of the matrix
 data_q <- quantile(data_m, na.rm = T, probs = 1:1000/1000)
-```
 
-```{r load_waterlevel_s01}
+#' 
+## ----load_waterlevel_s01-------------------------------
 # read in waterlevel data
 waterlevel <- fread("data/data2018/waterlevelWestTerschelling.csv", sep = ";")
 
@@ -55,9 +55,9 @@ waterlevel[,dateTime := as.POSIXct(paste(date, time, sep = " "),
                                    format = "%d-%m-%Y %H:%M:%S", tz = "CET")]
 
 waterlevel <- setDT(distinct(setDF(waterlevel), dateTime, .keep_all = TRUE))
-```
 
-```{r plot_bathymetry_quantiles}
+#' 
+## ----plot_bathymetry_quantiles-------------------------
 # plot waterlevel quantiles with data from west terschelling
 waterlimits <- range(waterlevel$level)
 
@@ -72,18 +72,18 @@ fig_waterlevel_area <- ggplot()+
 
 ggsave(fig_waterlevel_area, filename = "figs/fig_waterlevel_area.png",
        dpi = 300, height = 4, width = 6); dev.off()
-```
 
-## Plot as 3D maps
-
-```{r make_water_seq}
+#' 
+#' ## Plot as 3D maps
+#' 
+## ----make_water_seq------------------------------------
 # make sequence
 waterdepth <- seq(waterlimits[1], waterlimits[2], length.out = 30)
 waterdepth <- c(waterdepth, rev(waterdepth))
-```
 
-
-```{r vis_data}
+#' 
+#' 
+## ----vis_data------------------------------------------
 # make visualisation
 for(i in 1:length(waterdepth)) {
   data_m %>%
@@ -107,23 +107,23 @@ for(i in 1:length(waterdepth)) {
   rgl::snapshot3d(paste0("figs/tide_rise/fig",str_pad(i, 2, pad = "0"),".png"))
   rgl::rgl.close()
 }
-```
 
-```{r make_tide_gif}
+#' 
+## ----make_tide_gif-------------------------------------
 library(magick)
 list.files(path = "figs/tide_rise/", pattern = "*.png", full.names = T) %>% 
   map(image_read) %>% # reads each path file
   image_join() %>% # joins image
   image_animate(fps=2) %>% # animates, can opt for number of loops
   image_write("figs/fig_tide_rise_anim.gif") # write to current dir
-```
 
-
-```{r include_gif, eval=TRUE, fig.cap="Waterlevel at West Terschelling and effect on coverage of mudflats around Griend."}
+#' 
+#' 
+## ----include_gif, eval=TRUE, fig.cap="Waterlevel at West Terschelling and effect on coverage of mudflats around Griend."----
 if (knitr:::is_latex_output()) {
   
 } else {
   knitr::include_graphics("figs/fig_tide_rise_anim.gif")
 }
-```
 
+#' 
