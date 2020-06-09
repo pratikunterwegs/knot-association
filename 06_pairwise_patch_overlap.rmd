@@ -1,0 +1,73 @@
+---
+editor_options: 
+  chunk_output_type: console
+---
+
+# Within and between patch variance in traits
+
+Here we relate the extent of temporal and spatial overlap to pairwise differences in traits.
+
+## Read in patch data and overlaps
+
+```{r}
+library(readr)
+library(ggplot2)
+library(scales)
+library(tidyr); library(tibble)
+library(magrittr)
+
+# stats
+library(lmerTest)
+
+# ci fun
+ci <- function(x){qnorm(0.975)*sd(x, na.rm = T)/sqrt((length(x)))}
+```
+
+```{r}
+# read in patch data
+data_patches <- read_csv("data/data2018/data_2018_patch_summary_has_patches.csv")
+# read in flock data
+data <- read_csv("data/data2018/data_patch_flocks_2018.csv")
+data <- select(data, -X1)
+```
+
+## Link overlap with id data
+
+First identify unique patches in the patch data.
+
+```{r}
+# add a uid, this corresponds to the uid in the overlap data
+data_patches <- mutate(data_patches, uid = 1:nrow(data_patches))
+
+# add individual data to patch data
+data_id <- read_csv("data/data2018/SelinDB.csv") %>% 
+  filter(!is.na(Toa_Tag)) %>% 
+  select(Toa_Tag, 
+         wing = WING, mass = MASS, 
+         gizzard_mass) %>% 
+  drop_na()
+
+# join
+data_patches <- data_patches %>% 
+  left_join(data_id, by = c("id" = "Toa_Tag"))
+
+# merge the patches with id data on i
+data <- left_join(data, data_patches,
+                  by = c("patch_i_unique_id" = "uid"))
+
+# now merge on j
+data <- left_join(data, data_patches,
+                  by = c("patch_j_unique_id" = "uid"))
+```
+
+## Get flock level metrics
+
+```{r}
+# get the ids of individuals and patches in a flock
+data_flock <- group_by(data, flock) %>% 
+  nest() %>% 
+  transmute(flock_id = map(data, function(df) unique(c(df$id.x, df$id.y))),
+         flock_patch = map(data, function(df) unique(c(df$patch_i_unique_id, 
+                                                       df$patch_j_unique_id))))
+```
+
