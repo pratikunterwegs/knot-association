@@ -18,9 +18,6 @@ library(purrr)
 library(stringr)
 library(forcats)
 
-# to work with networks
-library(igraph)
-
 # to plot
 library(ggplot2)
 library(scico)
@@ -33,6 +30,7 @@ ci <- function(x){qnorm(0.975)*sd(x, na.rm = T)/sqrt((length(x)))}
 # read in patch data
 data_patches <- read_csv("data/data2018/data_2018_patch_summary_has_patches.csv") %>% 
   mutate(uid = as.character(1:nrow(.)))
+
 # read in overlap data
 data <- read_csv("data/data2018/data_spatio_temporal_overlap_2018.csv")
 ```
@@ -163,6 +161,18 @@ data_summary <- data_summary %>%
 # then unnest
 data_summary <- unnest(data_summary,
                        col = "data")
+```
+
+## Save data to file for analyses
+
+```{r}
+write_csv(data_summary, path = "data/data_pairwise_comparisons.csv")
+```
+
+## Read data for statistical analyses
+
+```{r}
+read_csv(data_summary, path = "data/data_pairwise_comparisons.csv")
 ```
 
 ### Subsample for even coverage
@@ -320,59 +330,3 @@ Read in the model summary and write.
 
 ```{r}
 cat(read_lines("results/model_sp_overlap.txt"), sep = "\n")
-```
-
-
-## Statistical modelling of temporal overlap
-
-### GLMM for temporal overlap
-
-```{r}
-# run a model with overlap as the response
-library(lmerTest)
-model_time_overlap_full <- lmer(tot_overlap_time ~ diff_gizzard * tide_stage +
-                         diff_behav * tide_stage +
-                         (1|tide_number) +
-                         (1|uid_pair),
-                       data = data_subsample)
-
-# run an alternative model with only behaviour
-model_time_overlap_behav_only <- lmer(tot_overlap_time ~ 
-                         diff_behav * tide_stage +
-                         (1|tide_number) +
-                         (1|uid_pair),
-                       data = data_subsample)
-
-# only gizzard
-model_time_overlap_gizzard_only <- lmer(tot_overlap_time ~ 
-                                          diff_gizzard * tide_stage +
-                                          (1|tide_number) +
-                                          (1|uid_pair),
-                                        data = data_subsample)
-```
-
-### AIC and R<sup>2</sup> comparison
-
-Compare the AIC weights after looking at the model summaries.
-
-```{r}
-summary(model_time_overlap_full)
-
-summary(model_time_overlap_reduced)
-```
-
-Temporal overlap cannot be explained by the difference in gizzard mass or the difference in behaviour. This is an interesting pattern when taken together with the positive effect of behavioural difference on spatial overlap.
-
-```{r}
-# get aic difference
-AIC(model_time_overlap_full) - AIC(model_time_overlap_reduced)
-
-# get R2
-MuMIn::r.squaredGLMM(model_time_overlap_reduced)
-```
-
-## Save data to file for network analyses
-
-```{r}
-write_csv(data_summary, path = "data/data_pairwise_comparisons.csv")
-```
