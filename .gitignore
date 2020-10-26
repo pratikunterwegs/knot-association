@@ -45,4 +45,4 @@ figs/*.html
 *Rplots*
 
 # the presentation folder
-presentation/
+*.xlsx
