@@ -9,7 +9,7 @@ print(os.getcwd())
 # read in the SPATIAL data
 # because the patch data has some spatials missing
 # ie patches are described but not made
-patches = gpd.read_file("data/data_2018/spatials/patches_2018.gpkg")
+patches = gpd.read_file("data/patches_2018.gpkg")
 
 # plot patches for a sanity check
 subset = patches.iloc[0:1000]
