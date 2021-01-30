@@ -48,3 +48,4 @@ figs/*.html
 *.xlsx
 # any gpkgs
 *.gpkg
+griend_polygon*
