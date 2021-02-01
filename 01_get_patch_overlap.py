@@ -6,33 +6,36 @@ from ncls import NCLS
 
 print(os.getcwd())
 
+# ///////// no longer necessary and is done in r /////////////////
 # read in the SPATIAL data
 # because the patch data has some spatials missing
 # ie patches are described but not made
-patches = gpd.read_file("data/patches_2018.gpkg")
+# patches = gpd.read_file("data/data_patches_good_2018_basic.gpkg")
 
 # plot patches for a sanity check
-subset = patches.iloc[0:1000]
-subset.plot(linewidth=0.5,
-            column='id',
-            alpha=0.2,
-            cmap='tab20b', edgecolor='black')
+# subset = patches.iloc[0:1000]
+# subset.plot(linewidth=0.5,
+#             column='id',
+#             alpha=0.2,
+#             cmap='tab20b', edgecolor='black')
 
 # convert to dataframe, export, and read in again
-data = pd.DataFrame(patches.drop(columns='geometry'))
+# data = pd.DataFrame(patches.drop(columns='geometry'))
 
-# assign unique patch id
-data['uid'] = np.arange(0, data.shape[0])
+# # assign unique patch id
+# data['uid'] = np.arange(0, data.shape[0])
 
-# overwrite data with uid
-data.to_csv("data/data_2018/data_2018_patch_summary_has_patches.csv",
-            index=False)
+# # overwrite data with uid
+# data.to_csv("data/data_2018/data_2018_patch_summary_has_patches.csv",
+#             index=False)
 
 # remove from memory
-del patches
+# del patches
+
+# //////////////// next bit necessary /////////////////////////
 
 # re-read csv data because of integer handling differences
-data = pd.read_csv("data/data_2018/data_2018_patch_summary_has_patches.csv")
+data = pd.read_csv("data/data_2018_good_patches.csv")
 # get integer series of start and end times of patches
 t_start = data['time_start'].astype(np.int64)
 t_end = data['time_end'].astype(np.int64)
