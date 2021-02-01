@@ -49,3 +49,9 @@ figs/*.html
 # any gpkgs
 *.gpkg
 griend_polygon*
+
+# excel
+*.xl*
+
+# python cache
+*pycache*
