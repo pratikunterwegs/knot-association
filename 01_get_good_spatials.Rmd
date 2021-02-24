@@ -15,12 +15,16 @@ get data
 ```{r}
 # get good patches
 good_patches = fread("data/data_2018_good_patches.csv")
+
+#uid
+good_patches[, uid := sprintf("%i_%i_%i", id, tide_number, patch)]
+
+# save good patches with uid
+fwrite(good_patches, "data/data_2018_good_patches.csv")
 # get good patch id, tide, and number
 good_patches = good_patches[, c("id", "tide_number", "patch")]
 # assign marker
 good_patches[, keep := T]
-#uid
-good_patches[, uid := sprintf("%i_%i_%i", id, tide_number, patch)]
 ```
 
 get spatial data
