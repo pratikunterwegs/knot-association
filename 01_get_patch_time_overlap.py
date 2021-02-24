@@ -14,7 +14,8 @@ data = data.loc[1:1000,]
 # get integer series of start and end times of patches
 t_start = data['time_start'].astype(np.int64)
 t_end = data['time_end'].astype(np.int64)
-t_id = data['uid']
+patch_uid = data['uid']
+t_id = np.arange(0, len(t_start))
 
 # trial ncls
 # only works on pandas and not geopandas else throws error!
@@ -25,18 +26,17 @@ ncls = NCLS(t_start.values, t_end.values, t_id.values)
 # get a dataframe of the overlapping pairs and the extent of overlap
 data_list = []
 for i in np.arange(1, len(t_id)+1):
-    ncls = NCLS(t_start[i:].values, t_end[i:].values, t_id[i:].values)
-    it = ncls.find_overlap(t_start[i],
-                           t_end[i])
+    ncls = NCLS(t_start[i:].values, t_end[i:].values, t_id[i-1:])  # id needs to be from an array
+    it = ncls.find_overlap(t_start[i], t_end[i])
     # get the unique patch ids overlapping
     overlap_id = []
     overlap_extent = []
     # get the extent of overlap
     for x in it:
-        overlap_id.append(x[2])
+        overlap_id.append(patch_uid[x[2]])  # x[2] is the t_id index
         overlap_extent.append(min(x[1], t_end[i]) - max(x[0], t_start[i]))
     # add the overlap id for each obs
-    uid = [i] * len(overlap_id)
+    uid = [patch_uid[i]] * len(overlap_id)
     # zip the tuples together
     tmp_data = list(zip(uid, overlap_id, overlap_extent))
     # convert to lists
