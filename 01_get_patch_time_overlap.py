@@ -22,7 +22,7 @@ ncls = NCLS(t_start.values, t_end.values, t_id)
 # look at all the overlaps in time
 # get a dataframe of the overlapping pairs and the extent of overlap
 data_list = []
-for i in np.arange(1, len(t_id)+1):
+for i in np.arange(1, len(t_id)):
     ncls = NCLS(t_start[i:].values, t_end[i:].values, t_id[i-1:])  # id needs to be from an array
     it = ncls.find_overlap(t_start[i], t_end[i])
     # get the unique patch ids overlapping
