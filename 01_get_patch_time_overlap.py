@@ -8,9 +8,6 @@ print(os.getcwd())
 # re-read csv data because of integer handling differences
 data = pd.read_csv("data/data_2018_good_patches.csv")
 
-# use a subset
-data = data.loc[1:1000,]
-
 # get integer series of start and end times of patches
 t_start = data['time_start'].astype(np.int64)
 t_end = data['time_end'].astype(np.int64)
@@ -20,7 +17,7 @@ t_id = np.arange(0, len(t_start))
 # trial ncls
 # only works on pandas and not geopandas else throws error!
 # this is very weird behaviour, pd and gpd must differ in int implementation
-ncls = NCLS(t_start.values, t_end.values, t_id.values)
+ncls = NCLS(t_start.values, t_end.values, t_id)
 
 # look at all the overlaps in time
 # get a dataframe of the overlapping pairs and the extent of overlap
