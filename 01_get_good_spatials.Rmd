@@ -5,7 +5,7 @@ editor_options:
 ---
 
 ```{r}
-#load libs
+# load libs
 library(data.table)
 library(sf)
 ```
@@ -14,15 +14,15 @@ get data
 
 ```{r}
 # get good patches
-good_patches = fread("data/data_2018_good_patches.csv")
+good_patches <- fread("data/data_2018_good_patches.csv")
 
-#uid
+# uid
 good_patches[, uid := sprintf("%i_%i_%i", id, tide_number, patch)]
 
 # save good patches with uid
 fwrite(good_patches, "data/data_2018_good_patches.csv")
 # get good patch id, tide, and number
-good_patches = good_patches[, c("id", "tide_number", "patch")]
+good_patches <- good_patches[, c("id", "tide_number", "patch")]
 # assign marker
 good_patches[, keep := T]
 ```
@@ -31,29 +31,31 @@ get spatial data
 
 ```{r}
 # get spatials
-patches = st_read("data/patches_2018.gpkg")
+patches <- st_read("data/patches_2018.gpkg")
 ```
 
 better filter
 
 ```{r}
 # get patch basic
-patches = dplyr::select(
-  patches, 
+patches <- dplyr::select(
+  patches,
   id, patch, tide_number,
   time_mean, time_start, time_end
 )
 
 # merge with good patches
-patches$uid =  sprintf("%i_%i_%i", patches$id, patches$tide_number, patches$patch)
+patches$uid <- sprintf("%i_%i_%i", patches$id, patches$tide_number, patches$patch)
 
 # drop nas
-patches = patches[patches$uid %in% good_patches$uid, ]
+patches <- patches[patches$uid %in% good_patches$uid, ]
 
 # get distinct
-patches = patches[!duplicated(patches$uid), ]
+patches <- patches[!duplicated(patches$uid), ]
 
 # write basic
 st_write(patches,
-         "data/data_patches_good_2018_basic.gpkg", append = F)
+  "data/data_patches_good_2018_basic.gpkg",
+  append = F
+)
 ```
