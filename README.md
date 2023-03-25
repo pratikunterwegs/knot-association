@@ -1,5 +1,7 @@
 # Assortative association in red knot residence patches
 
+[![Project Status: Abandoned – Initial development has started, but there has not yet been a stable, usable release; the project has been abandoned and the author(s) do not intend on continuing development.](https://www.repostatus.org/badges/latest/abandoned.svg)](https://www.repostatus.org/#abandoned)
+
 This repository is the source for a project to idenify residence patches from high-resolution tracking data from individual red knots _Calidris canutus islandica_, and study whether associations are assortative on individual traits.
 
 ## [Readable version](https://pratikunterwegs.github.io/knot-association/)
@@ -15,8 +17,3 @@ Pratik Gupte (author and maintainer)
 Guest researcher, COS -- NIOZ  
 p.r.gupte@rug.nl  
 Nijenborgh 7/5172.0583 9747AG Groningen  
-
-Allert Bijleveld (PI): allert.bijleveld@nioz.nl  
-Project information: https://www.nioz.nl/en/about/cos/coastal-movement-ecology/shorebird-tracking
-
-Contact PI Allert for data access.
